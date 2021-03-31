@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.content.res.ColorStateList;
 import android.content.res.XmlResourceParser;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -18,8 +19,14 @@ import androidx.fragment.app.Fragment;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import ua.com.locationservice.MainActivity;
 import ua.com.locationservice.R;
+import ua.com.locationservice.entity.User;
+import ua.com.locationservice.retrofit.RetrofitClient;
+import ua.com.locationservice.service.UserService;
 import ua.com.locationservice.ui.CustomToast;
 import ua.com.locationservice.utils.Utils;
 
@@ -109,8 +116,28 @@ public class ForgotPasswordFragment extends Fragment implements OnClickListener 
                     "Your Email Id is Invalid.");
 
             // Else submit email id and fetch passwod or do your stuff
-        else
-            Toast.makeText(getActivity(), "Get Forgot Password.",
-                    Toast.LENGTH_SHORT).show();
+        else {
+            UserService userService =
+                    RetrofitClient.createService();
+            Call<User> call = userService.getPassByEmail(getEmailId);
+            call.enqueue(new Callback<User>() {
+                @Override
+                public void onResponse(Call<User> call, Response<User> response) {
+                    if (response.isSuccessful()) {
+                        new CustomToast().Show_Toast(getActivity(), view,
+                                "Your Password is" + response.body().getPassword());
+                    } else {
+                        new CustomToast().Show_Toast(getActivity(), view,
+                                "Try again.");
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<User> call, Throwable t) {
+                    // something went completely south (like no internet connection)
+                    Log.d("Error", t.getMessage());
+                }
+            });
+        }
     }
 }

@@ -1,5 +1,7 @@
 package ua.com.locationservice.service;
 
+import android.widget.EditText;
+
 import java.util.List;
 
 import retrofit2.Call;
@@ -27,9 +29,11 @@ public interface UserService {
     @DELETE("delete/{id}")
     Call<User> deleteUser(@Path("id") int id);
 
-    @POST("authenticate/")
-    Call<User> userLogin (@Body LoginRequest request);
-
     @POST
     Call<User> signUp (@Body SignUpRequest request);
+
+    @POST("/login")
+    Call<User> basicLogin();
+    @GET("/getPass")
+    Call<User> getPassByEmail(@Body String emailId);
 }

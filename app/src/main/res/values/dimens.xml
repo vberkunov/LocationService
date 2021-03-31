@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="icon_size">30dp</dimen>
+    <dimen name="width">200</dimen>
+    <dimen name="height">300</dimen>
 </resources>

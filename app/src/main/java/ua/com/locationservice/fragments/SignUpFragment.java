@@ -3,8 +3,14 @@ package ua.com.locationservice.fragments;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import ua.com.locationservice.MainActivity;
 import ua.com.locationservice.R;
+import ua.com.locationservice.entity.User;
+import ua.com.locationservice.retrofit.RetrofitClient;
+import ua.com.locationservice.service.UserService;
 import ua.com.locationservice.ui.CustomToast;
 import ua.com.locationservice.utils.Utils;
 
@@ -12,6 +18,7 @@ import android.annotation.SuppressLint;
 import android.content.res.ColorStateList;
 import android.content.res.XmlResourceParser;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -24,6 +31,9 @@ import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 
 public class SignUpFragment extends Fragment implements OnClickListener {
     private static View view;
@@ -147,8 +157,31 @@ public class SignUpFragment extends Fragment implements OnClickListener {
             Toast.makeText(getActivity(), "Do SignUp.", Toast.LENGTH_SHORT)
                     .show();
         //mListener.onLoginFragmentInteraction(getEmailId, getPassword);
-            replaceListLocation();
+            signUP(new User(getEmailId.hashCode(),getFullName,getEmailId,getLocation,getMobileNumber,getPassword));
 
+    }
+
+    private void signUP(User user) {
+        UserService userService =
+                RetrofitClient.createService();
+        Call<User> call = userService.addUser(user);
+        call.enqueue(new Callback<User>() {
+            @Override
+            public void onResponse(Call<User> call, Response<User> response) {
+                if (response.isSuccessful()) {
+                    replaceListLocation();
+                } else {
+                    new CustomToast().Show_Toast(getActivity(), view,
+                            "Try again.");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<User> call, Throwable t) {
+                // something went completely south (like no internet connection)
+                Log.d("Error", t.getMessage());
+            }
+        });
     }
 
     public void replaceListLocation(){

@@ -4,8 +4,14 @@ package ua.com.locationservice.fragments;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import ua.com.locationservice.LocationActivity;
 import ua.com.locationservice.R;
+import ua.com.locationservice.entity.User;
+import ua.com.locationservice.retrofit.RetrofitClient;
+import ua.com.locationservice.service.UserService;
 import ua.com.locationservice.ui.CustomToast;
 import ua.com.locationservice.utils.Utils;
 
@@ -17,6 +23,7 @@ import android.os.Bundle;
 import android.text.InputType;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -199,9 +206,32 @@ public class LoginFragment extends Fragment implements OnClickListener{
                     "Your Email Id is Invalid.");
             // Else do login and do your stuff
         else
-            //mListener.onLoginFragmentInteraction(getEmailId, getPassword);
-            goToAttract(v);
+            getResponseFromApi(getEmailId, getPassword, v);
 
+
+    }
+
+    private void getResponseFromApi(String getEmailId, String getPassword, View v) {
+        UserService userService =
+                RetrofitClient.createService(UserService.class, "user", "secretpassword");
+        Call<User> call = userService.basicLogin();
+        call.enqueue(new Callback<User >() {
+            @Override
+            public void onResponse(Call<User> call, Response<User> response) {
+                if (response.isSuccessful()) {
+                    goToAttract(v);
+                } else {
+                    new CustomToast().Show_Toast(getActivity(), view,
+                            "Problem with your account.");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<User> call, Throwable t) {
+                // something went completely south (like no internet connection)
+                Log.d("Error", t.getMessage());
+            }
+        });
     }
 
     public void replaceGame(){
