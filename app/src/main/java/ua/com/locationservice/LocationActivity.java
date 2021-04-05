@@ -1,11 +1,13 @@
 package ua.com.locationservice;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -13,12 +15,23 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import java.security.Provider;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import ua.com.locationservice.adapter.DrawerItemCustomAdapter;
 import ua.com.locationservice.entity.Location;
 import ua.com.locationservice.fragments.MapFragment;
+import ua.com.locationservice.location.LocationProvider;
+import ua.com.locationservice.retrofit.RetrofitClient;
+import ua.com.locationservice.service.LocationService;
 import ua.com.locationservice.utils.Utils;
 
-public class LocationActivity extends AppCompatActivity{
+public class LocationActivity extends AppCompatActivity  {
 
     private static FragmentManager fragmentManager;
     private String[] mNavigationDrawerItemTitles;
@@ -27,30 +40,30 @@ public class LocationActivity extends AppCompatActivity{
     private CharSequence mDrawerTitle;
     private CharSequence mTitle;
     ActionBarDrawerToggle mDrawerToggle;
+    private String email;
+    private List<Location> list = new ArrayList<>();
+    private int position = 0;
+    private LocationProvider provider;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_location);
-        fragmentManager = getSupportFragmentManager();
-        if (savedInstanceState == null) {
-            fragmentManager
-                    .beginTransaction()
-                    .replace(R.id.content_frame, new MapFragment(),
-                            Utils.GameFragment).commit();
+        Bundle extras = getIntent().getExtras();
+        if(extras != null) {
+            email = extras.getString("email");
         }
+
+        getLocationInfo();
+        provider = LocationProvider.getInstanse();
         mTitle = mDrawerTitle = getTitle();
         mNavigationDrawerItemTitles= getResources().getStringArray(R.array.navigation_drawer_items_array);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
-        Location[] drawerItem = new Location[3];
-
-        drawerItem[0] = new Location(12,"Location 1");
-        drawerItem[1] = new Location(17, "Location 2");
-        drawerItem[2] = new Location(12, "Location 3");
 
 
-        DrawerItemCustomAdapter adapter = new DrawerItemCustomAdapter(this, R.layout.list_row_item_row, drawerItem);
+        DrawerItemCustomAdapter adapter = new DrawerItemCustomAdapter(this, R.layout.list_row_item_row, list);
         mDrawerList.setAdapter(adapter);
         mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -58,6 +71,53 @@ public class LocationActivity extends AppCompatActivity{
         setupDrawerToggle();
 
     }
+
+    private void getLocationInfo() {
+        LocationService locService =
+                RetrofitClient.createLocationService();
+        Call<List<Location>> call = locService.getLocationByEmail();
+        call.enqueue(new Callback<List<Location>>() {
+
+
+            @RequiresApi(api = Build.VERSION_CODES.N)
+            @Override
+            public void onResponse(Call<List<Location>> call, Response<List<Location>> response) {
+                for (Location l: response.body()) {
+                    list.add(l);
+                    provider.setPosition(l.getTag());
+                }
+                onLocationAvailable();
+
+            }
+
+            @Override
+            public void onFailure(Call<List<Location>> call, Throwable throwable) {
+                System.out.println(throwable.getMessage() );
+            }
+        });
+
+    }
+
+
+    public void onLocationAvailable() {
+        DrawerItemCustomAdapter adapter = new DrawerItemCustomAdapter(this, R.layout.list_row_item_row, list);
+        mDrawerList.setAdapter(adapter);
+        Bundle bundle = new Bundle();
+        bundle.putInt("tagId", list.get(position).getTag().getId());
+        bundle.putString("name", list.get(position).getName());
+        bundle.putDouble("width", list.get(position).getWidth());
+        bundle.putDouble("height", list.get(position).getHeight());
+        bundle.putString("tag", list.get(position).getTag().getName());
+        MapFragment fragment = new MapFragment();
+        fragment.setArguments(bundle);
+        fragmentManager = getSupportFragmentManager();
+            fragmentManager
+                    .beginTransaction()
+                    .replace(R.id.content_frame, fragment,
+                            Utils.GameFragment).commit();
+        }
+
+
 
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
 
@@ -68,32 +128,8 @@ public class LocationActivity extends AppCompatActivity{
     }
 
     private void selectItem(int position) {
-
-        Fragment fragment = null;
-
-        switch (position) {
-            case 0:
-            case 1:
-            case 2:
-                fragment = new MapFragment();
-                break;
-
-            default:
-                break;
-        }
-
-        if (fragment != null) {
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
-
-            mDrawerList.setItemChecked(position, true);
-            mDrawerList.setSelection(position);
-            setTitle(mNavigationDrawerItemTitles[position]);
-            mDrawerLayout.closeDrawer(mDrawerList);
-
-        } else {
-            Log.e("MainActivity", "Error in creating fragment");
-        }
+        this.position = position;
+        onLocationAvailable();
     }
 
     @Override

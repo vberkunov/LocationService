@@ -7,7 +7,7 @@ public class ApiUtils {
     public ApiUtils() {
     }
 
-    public static final String API_URL = "http://169.254.35.189:8080/demo/";
+    public static final String API_URL = "https://62.80.183.113/";
 
 
 }

@@ -5,8 +5,9 @@ import java.util.List;
 public class Location {
     public int id;
     public String name;
-    private List<User> users;
-    private Tag tag;
+    public double width;
+    public double height;
+    public Tag tag;
 
     // Constructor.
     public Location(int id, String name) {
@@ -15,10 +16,11 @@ public class Location {
         this.name = name;
     }
 
-    public Location(int id, String name, List<User> users, Tag tag) {
+    public Location(int id, String name, double width, double height, Tag tag) {
         this.id = id;
         this.name = name;
-        this.users = users;
+        this.width = width;
+        this.height = height;
         this.tag = tag;
     }
 
@@ -30,27 +32,15 @@ public class Location {
         return name;
     }
 
-    public List<User> getUsers() {
-        return users;
+    public double getWidth() {
+        return width;
+    }
+
+    public double getHeight() {
+        return height;
     }
 
     public Tag getTag() {
         return tag;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setUsers(List<User> users) {
-        this.users = users;
-    }
-
-    public void setTag(Tag tag) {
-        this.tag = tag;
     }
 }

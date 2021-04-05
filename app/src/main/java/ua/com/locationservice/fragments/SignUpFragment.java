@@ -163,7 +163,7 @@ public class SignUpFragment extends Fragment implements OnClickListener {
 
     private void signUP(User user) {
         UserService userService =
-                RetrofitClient.createService();
+                RetrofitClient.createUserService();
         Call<User> call = userService.addUser(user);
         call.enqueue(new Callback<User>() {
             @Override

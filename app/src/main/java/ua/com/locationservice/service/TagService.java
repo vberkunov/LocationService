@@ -17,6 +17,6 @@ public interface TagService {
     Call<List<User>> getTags();
 
     @GET("tag/{id}")
-    Call<User> getTagByID(@Path("id") int id, @Body Tag tag);
+    Call<Tag> getTagByID(@Path("id") int id);
 
 }

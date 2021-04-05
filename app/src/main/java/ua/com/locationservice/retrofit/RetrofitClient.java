@@ -12,6 +12,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import ua.com.locationservice.entity.User;
 import ua.com.locationservice.service.LocationService;
+import ua.com.locationservice.service.TagService;
 import ua.com.locationservice.service.UserService;
 import ua.com.locationservice.utils.ApiUtils;
 
@@ -37,12 +38,24 @@ public class RetrofitClient {
         return createService(serviceClass, null);
     }
 
-    public static UserService createService() {
+    public static UserService createUserService() {
            return  retrofit.create(UserService.class);
 
     }
 
-    public static <S> S createService(Class<S> serviceClass, final String authToken) {
+    public static  LocationService createLocationService(){
+        return  retrofit.create(LocationService.class);
+
+    }
+
+    public static TagService createTagService() {
+        return retrofit.create(TagService.class);
+
+    }
+
+
+
+        public static <S> S createService(Class<S> serviceClass, final String authToken) {
         if (!TextUtils.isEmpty(authToken)) {
             AuthenticationInterceptor interceptor =
                     new AuthenticationInterceptor(authToken);

@@ -118,7 +118,7 @@ public class ForgotPasswordFragment extends Fragment implements OnClickListener 
             // Else submit email id and fetch passwod or do your stuff
         else {
             UserService userService =
-                    RetrofitClient.createService();
+                    RetrofitClient.createUserService();
             Call<User> call = userService.getPassByEmail(getEmailId);
             call.enqueue(new Callback<User>() {
                 @Override

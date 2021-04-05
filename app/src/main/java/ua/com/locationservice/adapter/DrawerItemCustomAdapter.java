@@ -7,15 +7,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
+
+import java.util.List;
+
 import ua.com.locationservice.R;
 import ua.com.locationservice.entity.Location;
 
 public class DrawerItemCustomAdapter extends ArrayAdapter<Location> {
     Context mContext;
     int layoutResourceId;
-    Location locations[] = null;
+    List <Location> locations  = null;
 
-    public DrawerItemCustomAdapter(Context mContext, int layoutResourceId, Location[] locations) {
+    public DrawerItemCustomAdapter(Context mContext, int layoutResourceId, List<Location> locations) {
 
         super(mContext, layoutResourceId, locations);
         this.layoutResourceId = layoutResourceId;
@@ -33,7 +36,7 @@ public class DrawerItemCustomAdapter extends ArrayAdapter<Location> {
 
         TextView textViewName = (TextView) listItem.findViewById(R.id.textViewName);
 
-        Location folder = locations[position];
+        Location folder = locations.get(position);
 
         textViewName.setText(folder.name);
 

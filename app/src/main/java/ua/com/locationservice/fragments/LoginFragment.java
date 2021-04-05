@@ -219,7 +219,7 @@ public class LoginFragment extends Fragment implements OnClickListener{
             @Override
             public void onResponse(Call<User> call, Response<User> response) {
                 if (response.isSuccessful()) {
-                    goToAttract(v);
+                    goToAttract(v,getEmailId);
                 } else {
                     new CustomToast().Show_Toast(getActivity(), view,
                             "Problem with your account.");
@@ -234,18 +234,12 @@ public class LoginFragment extends Fragment implements OnClickListener{
         });
     }
 
-    public void replaceGame(){
-        fragmentManager
-                .beginTransaction()
-                .setCustomAnimations(R.anim.right_enter, R.anim.left_exit)
-                .replace(R.id.frameContainer,
-                        new MapFragment(),
-                        Utils.GameFragment).commit();
-    }
 
-    public void goToAttract(View v)
+
+    public void goToAttract(View v, String email)
     {
         Intent intent = new Intent(getActivity(), LocationActivity.class);
+        intent.putExtra("email", email);
         startActivity(intent);
     }
 

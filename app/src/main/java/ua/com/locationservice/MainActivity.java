@@ -101,52 +101,16 @@ public class MainActivity extends AppCompatActivity implements LoginFragment.OnF
     }
 
 
-    public void login(String email, String password){
 
-        LoginRequest loginRequest = new LoginRequest(email, password);
-        Call<User> loginResponse = RetrofitClient.getUserService().userLogin(loginRequest);
-        loginResponse.enqueue(new Callback<User>() {
-            @Override
-            public void onResponse(Call<User> call, Response<User> response) {
-                if(response.isSuccessful()){
-                        replaceMapFragment();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<User> call, Throwable throwable) {
-                Toast.makeText(MainActivity.this, "Login Unsuccessful", Toast.LENGTH_LONG).show();
-            }
-        });
-    }
-
-    public void signUp(String fullName, String email, String phone, String city, String password){
-
-        SignUpRequest signUpRequest= new SignUpRequest(fullName, email, phone, city, password);
-        Call<User> loginResponse = RetrofitClient.getUserService().signUp(signUpRequest);
-        loginResponse.enqueue(new Callback<User>() {
-            @Override
-            public void onResponse(Call<User> call, Response<User> response) {
-                if(response.isSuccessful()){
-                    replaceConfirmFragment();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<User> call, Throwable throwable) {
-                Toast.makeText(MainActivity.this, "Login Unsuccessful", Toast.LENGTH_LONG).show();
-            }
-        });
-    }
 
     @Override
     public void onLoginFragmentInteraction(String email, String password) {
-        login(email, password);
+
     }
 
 
     @Override
     public void onSignUpFragmentInteraction(String fullName, String email, String phone, String city, String password) {
-        signUp(fullName, email, phone, city, password);
+
     }
 }

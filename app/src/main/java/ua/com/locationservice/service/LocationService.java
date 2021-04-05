@@ -16,5 +16,7 @@ public interface LocationService {
     Call<List<Location>> getLocations();
 
     @GET("location/{id}")
-    Call<User> getLocationByID(@Path("id") int id, @Body Tag tag);
+    Call<Location> getLocationByID(@Path("id") int id, @Body Tag tag);
+    @GET("locations/")
+    Call<List<Location>> getLocationByEmail();
 }
